@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../njuko"
+		}
+	],
+	"settings": {
+		"javascript.validate.enable": false
+	}
+}
