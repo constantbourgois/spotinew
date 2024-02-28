@@ -8,39 +8,34 @@ import Moods from "./Moods";
 import { fetchTracks } from "./Spoti";
 import { getTrack } from "./Spoti";
 import loadingIcon from "./loading-icon.svg";
-import MainInterfaces from "./MainInterfaces";
+import {authUser}  from "./Spoti";
+import Playlists from "./Playlists";
+
+export interface Props{
+  token: string;
+}
+
 
 function App() {
   const [showPlayer, setShowPlayer] = useState(false);
   const [isLoading, setLoading] = useState(true);
-  const [Mood, setMood] = useState<Mood | null>(null);
+  const [Mood, setMood] = useState();
   const [SongsArray, setSongsArray] = useState();
   const [currentTrack, setCurrentTrack] = useState(new Audio);
   const [firstPlay, setFirstPlay] = useState(true);
-  const [firstToken, setFirstToken] = useState();
-/*
-  const firstFetchTracks = useEffect(() => {
-    (async () => {
-      
-    })();
-  }, [firstToken]);*/
-/*
-  const heyToto = ()=> {
-    console.log(firstToken);
-  }
-  */
+  const [firstToken, setFirstToken] = useState<string>("");
+
+  //const [code, setCode] = useState<string | null>(null);
+
+
   useEffect(() => {
     (async () => {
-      
-      //get tocken from server
-      const response = await fetch('/moods');
-      const body = await response.json();
-
-      if (response.status !== 200) {
-        throw Error(body.message);
-      }
-      setFirstToken(body.token);
-      const data = await fetchTracks(body.token);
+ 
+      const a = await authUser();
+    
+      setFirstToken( a?.accessToken);
+     
+      const data = await fetchTracks(a?.accessToken);
       setSongsArray(data);
       setLoading(false);
       // fetch the tracks
@@ -59,10 +54,6 @@ function App() {
       newAudioElem.play(); //
     })();
   };
-  /*
-  useEffect(() => {
-    getTracks().catch(console.error);
-  }, [getTracks]);*/
 
   if (isLoading) {
     return (
@@ -73,7 +64,7 @@ function App() {
   } else {
     return (
       <div className="App">
-        <header className="App-header">
+          <Playlists token={firstToken}/>
           <Moods openPlayer={openPlayer} />
           <Player
             token={firstToken}
@@ -84,7 +75,6 @@ function App() {
             selectedMood={Mood}
             showPlayer={showPlayer}
           />
-        </header>
       </div>
     );
   }
