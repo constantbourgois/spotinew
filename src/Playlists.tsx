@@ -2,7 +2,7 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { IconContext } from "react-icons";
-import { getPlaylists } from "./Spoti";
+import { getPlaylists, getTracksFromPlaylists } from "./Spoti";
 import { useEffect, useState } from "react";
 import { Props } from "./App";
 import FormControl from "@mui/material/FormControl";
@@ -11,7 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
-interface ItemI {
+interface PlaylistI {
   key: string;
   name: string;
   id: string;
@@ -19,12 +19,15 @@ interface ItemI {
 
 export default function Playlists({token}: Props) {
 
-  const [playArr, setPlayArr] = useState<ItemI[]>([]);
+  const [playArr, setPlayArr] = useState<PlaylistI[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedPlaylist(event.target.value);
-    console.log(event.target.value)
+      (async ()=> {
+    const tracks = await getTracksFromPlaylists(token, selectedPlaylist);
+      console.log(tracks);
+     })()
   };
 
   useEffect( () => {

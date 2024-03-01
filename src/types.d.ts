@@ -16,10 +16,7 @@ interface UserProfile {
     uri: string;
 }
 
-interface PlaylistTypes{
-    total : integer;
-    items: array
-}
+
 
 interface Image {
     url: string;

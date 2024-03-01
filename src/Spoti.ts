@@ -28,14 +28,22 @@ async function fetchProfile(code: string): Promise<UserProfile> {
 
     return result.json();
     }
-export async function getPlaylists( code: string): Promise<PlaylistTypes>{
-    const result = await fetch("https://api.spotify.com/v1/me/playlists",{
+
+export async function getPlaylists( code: string){
+    const result = await fetch(`https://api.spotify.com/v1/me`,{
         method: "GET", headers: { Authorization: `Bearer ${code}` }}
     )
 
 return result.json();
 }
 
+export async function getTracksFromPlaylists(  code: string, id: string){
+    const result = await fetch(`https://api.spotify.com/v1/me/playlists/${id}`,{
+        method: "GET", headers: { Authorization: `Bearer ${code}` }}
+    )
+
+return result.json();
+}
 
 function getRandomSearch() {
     // A list of all characters that can be chosen.
