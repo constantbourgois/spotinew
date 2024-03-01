@@ -5,43 +5,54 @@ import { IconContext } from "react-icons";
 import { getPlaylists } from "./Spoti";
 import { useEffect, useState } from "react";
 import { Props } from "./App";
-import { useFormControl } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-type playlist = string;
+
+interface ItemI {
+  key: string;
+  name: string;
+  id: string;
+}
 
 export default function Playlists({token}: Props) {
-  const [playArr, setPlayArr] = useState([]);
-  
+
+  const [playArr, setPlayArr] = useState<ItemI[]>([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setSelectedPlaylist(event.target.value);
+    console.log(event.target.value)
+  };
+
   useEffect( () => {
   
     (async ()=> {
      
-      const playlists = await getPlaylists(token);
+    const ps = await getPlaylists(token);
      
-      console.log(playlists);
-
-     setPlayArr(playlists.items);
-
+     setPlayArr(ps.items);
+ 
     })()
 
 },[token])
 
-const Ps = playArr.map(item => <option key={item.key} value={item.name}></option> )
-
+const playlists = playArr.map((item,index )=> <MenuItem id={item.id} key={index} value={item.id}>{item.name}</MenuItem> )
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
         <IconContext.Provider
-          value={{ size: "4em", color: "white", className: "global-class-name" }}
-        >
+          value={{ size: "4em", color: "white", className: "global-class-name" }}>
           <Grid item xs={12}>
-            <label>Choose your playlist</label>
-            <form>
-        <select name="pick-playlist">
-         {Ps}
-      </select>
-    </form>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id="demo-controlled-open-select-label">Playlist</InputLabel>
+              <Select value='' onChange={handleChange} name="pick-playlist">
+              {playlists}
+            </Select>
+            </FormControl>
           </Grid>
         </IconContext.Provider>
       </Grid>

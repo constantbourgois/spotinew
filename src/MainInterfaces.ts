@@ -18,7 +18,7 @@ interface UserProfile {
 
 interface PlaylistTypes{
     total : integer;
-    items: array
+
 }
 
 interface Image {

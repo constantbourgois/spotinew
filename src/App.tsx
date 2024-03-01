@@ -10,9 +10,18 @@ import { getTrack } from "./Spoti";
 import loadingIcon from "./loading-icon.svg";
 import {authUser}  from "./Spoti";
 import Playlists from "./Playlists";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 export interface Props{
   token: string;
+  playArr: number[]
 }
 
 
@@ -63,6 +72,8 @@ function App() {
     );
   } else {
     return (
+      <ThemeProvider theme={darkTheme}>
+         <CssBaseline />
       <div className="App">
           <Playlists token={firstToken}/>
           <Moods openPlayer={openPlayer} />
@@ -76,6 +87,7 @@ function App() {
             showPlayer={showPlayer}
           />
       </div>
+      </ThemeProvider>
     );
   }
 }
