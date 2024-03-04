@@ -30,7 +30,7 @@ async function fetchProfile(code: string): Promise<UserProfile> {
     }
 
 export async function getPlaylists( code: string){
-    const result = await fetch(`https://api.spotify.com/v1/me`,{
+    const result = await fetch(`https://api.spotify.com/v1/me/playlists`,{
         method: "GET", headers: { Authorization: `Bearer ${code}` }}
     )
 
@@ -38,7 +38,7 @@ return result.json();
 }
 
 export async function getTracksFromPlaylists(  code: string, id: string){
-    const result = await fetch(`https://api.spotify.com/v1/me/playlists/${id}`,{
+    const result = await fetch(`https://api.spotify.com/v1/playlists/${id}?fields=tracks.items`,{
         method: "GET", headers: { Authorization: `Bearer ${code}` }}
     )
 
@@ -60,17 +60,21 @@ function getRandomSearch() {
     return randomSearch;
 }
 
-export async function fetchTracks(token:string):Promise<MainInterfaces> {
+export async function fetchTracks(code:string, tracksP: number[]) {
 
-
+        /*
     //const token = await getToken();
     //const randomOffset = Math.floor(Math.random() * 1000);
     const randomOffset = 0;
     const q = getRandomSearch();
 
+   
+    const Songs = await (await fetch(`https://api.spotify.com/v1/search?q=${q}&offset=${randomOffset}&limit=50&type=track`, requestOptions)).json();
+    */
+
     const myHeaders = new Headers();
-    console.log(token);
-    myHeaders.append("Authorization", `Bearer ${token}`);
+   
+    myHeaders.append("Authorization", `Bearer ${code}`);
 
     const requestOptions = {
         method: 'GET',
@@ -78,38 +82,34 @@ export async function fetchTracks(token:string):Promise<MainInterfaces> {
         //redirect: 'follow'
     };
 
-
-
-    const Songs = await (await fetch(`https://api.spotify.com/v1/search?q=${q}&offset=${randomOffset}&limit=50&type=track`, requestOptions)).json();
-
-    const tracks = Songs["tracks"]["items"];
-
     async function getTracks() {
+        tracksP.tracks.items.map( i => i.track.id);
+        await Promise.all(
+            async function (tracksP) {
 
-        await Promise.all(tracks.map(async (track) => {
-
-            await fetch(`https://api.spotify.com/v1/audio-features/${track['id']}`, requestOptions).then(
+            await fetch(`https://api.spotify.com/v1/audio-features/${i.track.id}`, requestOptions).then(
                 function (response) {
                     return response.json()
                 })
                 .then(
                     function (audio_features) {
-                        track.audio_features = audio_features;
-                        track.valence = audio_features['valence'];
-                        track.danceability = audio_features['danceability'];
-                        track.energy = audio_features['energy'];
+                        tracksP.audio_features = audio_features;
+                        tracksP.valence = audio_features['valence'];
+                        tracksP.danceability = audio_features['danceability'];
+                        tracksP.energy = audio_features['energy'];
 
                     })
                 .catch(error => console.log('error', error));
 
-        }))
-        return tracks;
+            }
+        )
+        return tracksP;
     }
     getTracks();
-    console.log(tracks.length);
+    console.log(tracksP.length);
 
 
-    return tracks
+    return tracksP
 
 
 }

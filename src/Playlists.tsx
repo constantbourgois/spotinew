@@ -2,7 +2,7 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { IconContext } from "react-icons";
-import { getPlaylists, getTracksFromPlaylists } from "./Spoti";
+import { fetchTracks, getPlaylists, getTracksFromPlaylists } from "./Spoti";
 import { useEffect, useState } from "react";
 import { Props } from "./App";
 import FormControl from "@mui/material/FormControl";
@@ -17,32 +17,42 @@ interface PlaylistI {
   id: string;
 }
 
-export default function Playlists({token}: Props) {
+export default function Playlists({ token }: Props) {
 
   const [playArr, setPlayArr] = useState<PlaylistI[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
 
   const handleChange = (event: SelectChangeEvent) => {
-    setSelectedPlaylist(event.target.value);
-      (async ()=> {
-    const tracks = await getTracksFromPlaylists(token, selectedPlaylist);
+    console.log(event.target);
+
+    const selPs = event.target.value;
+
+    setSelectedPlaylist(selPs);
+
+    (async () => {
+
+      let tracks = await getTracksFromPlaylists(token, selPs);
+      
+      tracks = await fetchTracks(token, tracks);
+      
       console.log(tracks);
-     })()
+
+    })()
   };
 
-  useEffect( () => {
-  
-    (async ()=> {
-     
-    const ps = await getPlaylists(token);
-     
-     setPlayArr(ps.items);
- 
+  useEffect(() => {
+
+    (async () => {
+
+      const ps = await getPlaylists(token);
+
+      setPlayArr(ps.items);
+
     })()
 
-},[token])
+  }, [token])
 
-const playlists = playArr.map((item,index )=> <MenuItem id={item.id} key={index} value={item.id}>{item.name}</MenuItem> )
+  const playlists = playArr.map((item, index) => <MenuItem id={item.id} key={index} value={item.id}>{item.name}</MenuItem>)
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -51,10 +61,10 @@ const playlists = playArr.map((item,index )=> <MenuItem id={item.id} key={index}
           value={{ size: "4em", color: "white", className: "global-class-name" }}>
           <Grid item xs={12}>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="demo-controlled-open-select-label">Playlist</InputLabel>
+              <InputLabel id="demo-controlled-open-select-label">Playlist</InputLabel>
               <Select value='' onChange={handleChange} name="pick-playlist">
-              {playlists}
-            </Select>
+                {playlists}
+              </Select>
             </FormControl>
           </Grid>
         </IconContext.Provider>

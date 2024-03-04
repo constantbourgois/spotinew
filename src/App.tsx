@@ -21,7 +21,7 @@ const darkTheme = createTheme({
 
 export interface Props{
   token: string;
-  playArr: number[]
+ 
 }
 
 
@@ -44,8 +44,8 @@ function App() {
     
       setFirstToken( a?.accessToken);
      
-      const data = await fetchTracks(a?.accessToken);
-      setSongsArray(data);
+      //const data = await fetchTracks(a?.accessToken);
+      //setSongsArray(data);
       setLoading(false);
       // fetch the tracks
       //firstFetchTracks();
