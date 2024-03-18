@@ -9,6 +9,7 @@ import { GrStop } from "react-icons/gr";
 import { fetchTracks } from "./Spoti";
 import { useState } from "react";
 import { useEffect } from "react";
+import { Props } from "./App";
 
 const style = {
   width: "100vw",
@@ -22,130 +23,129 @@ const style = {
   position: "absolute",
 };
 
-const Buttons = (props) => {
-  const [currentTrack, setCurrentTrack] = useState();
-  const [nextTrack, setNextTrack] = useState();
-  const mood = props.mood;
-  const firstPlay = props.firstPlay;
-  const setFirstPlay = props.setFirstPlay;
+const track = {
+  name: "",
+  album: {
+      images: [
+          { url: "" }
+      ]
+  },
+  artists: [
+      { name: "" }
+  ]
+}
 
-  console.log(props);
-  let playingTrack;
 
-  if (firstPlay === true) {
-    // if it's the first time a track is played
-    playingTrack = props.currentTrack;
-  } else {
-    // otherwise
-    playingTrack = currentTrack;
-  }
 
-  useEffect(() => {
-    if (currentTrack) {
-      currentTrack.play();
-    }
-    if (nextTrack) {
-      console.log(currentTrack, nextTrack);
-    }
-  }, [nextTrack, currentTrack]);
-
-  function stopPlay() {
-    playingTrack.pause();
-  }
-
-  function startPlay() {
-    playingTrack.play();
-  }
-
-  function nextPlay() {
-    playingTrack.pause();
-
-    if (firstPlay === true) {
-      setCurrentTrack(props.nextTrack);
-    } else if (firstPlay === false) {
-      setCurrentTrack(nextTrack);
-    }
-    //currentTrack.play();
-
-    // get the next track
-    (async () => {
-      const SongsArray = await fetchTracks(props.token);
-      const t = await getTrack(SongsArray, mood);
-      const newAudioElem = new Audio(t); //get the audio
-      setNextTrack(newAudioElem);
-    })();
-
-    setFirstPlay(false);
-  }
-
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-        container
-        spacing={2}
-      >
-        <IconContext.Provider
-          value={{
-            size: "4em",
-            color: "white",
-            className: "global-class-name",
-          }}
-        >
-          <Grid onClick={startPlay} textAlign="center" item xs={4}>
-            <button>
-              <GrPlay />
-            </button>
-          </Grid>
-          <Grid onClick={stopPlay} textAlign="center" item xs={4}>
-            <button>
-              <GrStop />
-            </button>
-          </Grid>
-          <Grid onClick={nextPlay} textAlign="center" item xs={4}>
-            <button>
-              <GrChapterNext />
-            </button>
-          </Grid>
-        </IconContext.Provider>
-      </Grid>
-    </Box>
-  );
-};
-
-export default function Player(props) {
+export default function Player({token, selectedMood, getDeviceId}: Props) {
   const [nextTrack, setNextTrack] = useState(null);
-  const mood = props.selectedMood;
+  const mood = selectedMood;
+  const [is_paused, setPaused] = useState(false);
+    const [is_active, setActive] = useState(false);
+    const [player, setPlayer] = useState(undefined);
+    const [current_track, setTrack] = useState(track);
+
+
 
   useEffect(() => {
-    if (props.selectedMood) {
+    if (selectedMood) {
       //console.log(props.firstPlay);
       //props.setFirstPlay(false);
       (async () => {
         // get the next track
-        const SongsArray = await fetchTracks(props.token);
-        const t = await getTrack(SongsArray, props.selectedMood);
+        const SongsArray = await fetchTracks(token);
+        
+        const t = await getTrack(SongsArray, selectedMood);
+        
         const newAudioElem = new Audio(t); //get the audio
+        
         setNextTrack(newAudioElem);
+      
       })();
     }
-    console.log("mood", props.selectedMood);
-  }, [props.selectedMood, props.token]);
+    console.log("mood", selectedMood);
 
-  if (props.showPlayer === true) {
-    return (
-      <div className="player" style={style}>
-        <Buttons
-          firstPlay={props.firstPlay}
-          setFirstPlay={props.setFirstPlay}
-          currentTrack={props.currentTrack}
-          nextTrack={nextTrack}
-          mood={mood}
-          token={props.token}
-        />
-      </div>
-    );
-  }
+    const script = document.createElement("script");
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
+
+        document.body.appendChild(script);
+
+        window.onSpotifyWebPlaybackSDKReady = () => {
+
+            const player = new window.Spotify.Player({
+                name: 'Web Playback SDK',
+                getOAuthToken: cb => { cb(token); },
+                volume: 0.5
+            });
+
+            setPlayer(player);
+
+            player.addListener('ready', ({ device_id }) => {
+              getDeviceId(device_id);
+                console.log('Ready with Device ID', device_id);
+            });
+
+            player.addListener('not_ready', ({ device_id }) => {
+                console.log('Device ID has gone offline', device_id);
+            });
+
+            player.addListener('player_state_changed', ( state => {
+
+                if (!state) {
+                    return;
+                }
+
+                setTrack(state.track_window.current_track);
+                setPaused(state.paused);
+
+                player.getCurrentState().then( state => { 
+                    (!state)? setActive(false) : setActive(true) 
+                });
+
+            }));
+
+            player.connect();
+
+        };
+    }, []);
+
+    if (!is_active) { 
+        return (
+            <>
+                <div className="container">
+                    <div className="main-wrapper">
+                        <b> Instance not active. Transfer your playback using your Spotify app </b>
+                    </div>
+                </div>
+            </>)
+    } else {
+        return (
+            <>
+                <div className="container">
+                    <div className="main-wrapper">
+
+                        <img src={current_track.album.images[0].url} className="now-playing__cover" alt="" />
+
+                        <div className="now-playing__side">
+                            <div className="now-playing__name">{current_track.name}</div>
+                            <div className="now-playing__artist">{current_track.artists[0].name}</div>
+
+                            <button className="btn-spotify" onClick={() => { player.previousTrack() }} >
+                                &lt;&lt;
+                            </button>
+
+                            <button className="btn-spotify" onClick={() => { player.togglePlay() }} >
+                                { is_paused ? "PLAY" : "PAUSE" }
+                            </button>
+
+                            <button className="btn-spotify" onClick={() => { player.nextTrack() }} >
+                                &gt;&gt;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
 }

@@ -13,6 +13,8 @@ import Playlists from "./Playlists";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+console.log(Playlists);
+
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -21,6 +23,8 @@ const darkTheme = createTheme({
 
 export interface Props{
   token: string;
+  selectedMood: string;
+
  
 }
 
@@ -33,6 +37,8 @@ function App() {
   const [currentTrack, setCurrentTrack] = useState(new Audio);
   const [firstPlay, setFirstPlay] = useState(true);
   const [firstToken, setFirstToken] = useState<string>("");
+  const [deviceId, setDeviceId]  = useState();
+
 
   //const [code, setCode] = useState<string | null>(null);
 
@@ -63,6 +69,15 @@ function App() {
       newAudioElem.play(); //
     })();
   };
+  
+  const getPlaylistTracks = (tracks) =>{
+    setSongsArray(tracks);
+  }
+
+  const getDeviceId = deviceId => {
+    setDeviceId(deviceId);
+  }
+  
 
   if (isLoading) {
     return (
@@ -75,11 +90,12 @@ function App() {
       <ThemeProvider theme={darkTheme}>
          <CssBaseline />
       <div className="App">
-          <Playlists token={firstToken}/>
+          <Playlists getPlaylistTracks={getPlaylistTracks} token={firstToken}/>
           <Moods openPlayer={openPlayer} />
           <Player
             token={firstToken}
             firstPlay={firstPlay}
+            getDeviceId={getDeviceId}
             setFirstPlay={setFirstPlay}
             currentTrack={currentTrack}
             songsArray={SongsArray}

@@ -17,13 +17,13 @@ interface PlaylistI {
   id: string;
 }
 
-export default function Playlists({ token }: Props) {
+export default function Playlists({ token , getPlaylistTracks }: Props) {
 
   const [playArr, setPlayArr] = useState<PlaylistI[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
+  const [tracksArray ,setTracksArray] = useState<string>('');
 
   const handleChange = (event: SelectChangeEvent) => {
-    console.log(event.target);
 
     const selPs = event.target.value;
 
@@ -34,8 +34,8 @@ export default function Playlists({ token }: Props) {
       let tracks = await getTracksFromPlaylists(token, selPs);
       
       tracks = await fetchTracks(token, tracks);
+      getPlaylistTracks(tracks);
       
-      console.log(tracks);
 
     })()
   };

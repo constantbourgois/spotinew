@@ -10,12 +10,12 @@ export async function authUser() {
     redirectToAuthCodeFlow(clientId);
   } else {
     const accessToken = await getAccessToken(clientId, code);
-    const prof = await fetchProfile(accessToken);
+    //const prof = await fetchProfile(accessToken);
 
-    return { accessToken, prof };
+    return { accessToken };
   }
 }
-
+/*
 async function fetchProfile(code: string): Promise<UserProfile> {
   const result = await fetch("https://api.spotify.com/v1/me", {
     method: "GET",
@@ -24,6 +24,7 @@ async function fetchProfile(code: string): Promise<UserProfile> {
 
   return result.json();
 }
+*/
 
 export async function getPlaylists(code: string) {
   const result = await fetch(`https://api.spotify.com/v1/me/playlists`, {
@@ -64,15 +65,6 @@ function getRandomSearch() {
 }
 
 export async function fetchTracks(code: string, tracksP: number[]) {
-  /*
-    //const token = await getToken();
-    //const randomOffset = Math.floor(Math.random() * 1000);
-    const randomOffset = 0;
-    const q = getRandomSearch();
-
-   
-    const Songs = await (await fetch(`https://api.spotify.com/v1/search?q=${q}&offset=${randomOffset}&limit=50&type=track`, requestOptions)).json();
-    */
 
   const myHeaders = new Headers();
 
@@ -96,7 +88,7 @@ export async function fetchTracks(code: string, tracksP: number[]) {
                 return response.json();
               })
               .then(function (audio_features) {
-                console.log(audio_features);
+               
                 i.track.audio_features = audio_features;
                 i.track.valence = audio_features["valence"];
                 i.track.danceability = audio_features["danceability"];
@@ -140,7 +132,7 @@ export async function getTrack(Songs, mood) {
             current.danceability > previous.danceability ? current : previous;
           return a;
         });
-        songUrl = dancingSong["preview_url"];
+        songUrl = dancingSong.href;
         return songUrl;
       }
       default: {
@@ -148,4 +140,20 @@ export async function getTrack(Songs, mood) {
       }
     }
   }
+}
+
+export async function getTransferPlayback(code: string, trackId:string){
+ 
+
+  const result = await fetch(
+    `https://api.spotify.com/v1/me/player`,
+    {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${code}` },
+      body: {`[device_ids:${trackId}]` },
+    }
+  );
+
+  return result.json();
+
 }
