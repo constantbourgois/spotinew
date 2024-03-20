@@ -108,6 +108,7 @@ export async function fetchTracks(code: string, tracksP: number[]) {
 
 export async function getTrack(Songs, mood) {
   let songsArray = Songs;
+  console.log(Songs);
 
   let songUrl;
 
@@ -117,11 +118,11 @@ export async function getTrack(Songs, mood) {
 
     switch (mood) {
       case "happy": {
-        songUrl = songsArray[Math.floor(songsArray.length / 2)]["preview_url"];
+        songUrl = songsArray[Math.floor(songsArray.length / 2)]["uri"];
         return songUrl;
       }
       case "sad": {
-        songUrl = songsArray[0]["preview_url"];
+        songUrl = songsArray[0]["uri"];
         return songUrl;
       }
       case "excited": {
@@ -132,7 +133,7 @@ export async function getTrack(Songs, mood) {
             current.danceability > previous.danceability ? current : previous;
           return a;
         });
-        songUrl = dancingSong.href;
+        songUrl = dancingSong.uri;
         return songUrl;
       }
       default: {
@@ -142,18 +143,16 @@ export async function getTrack(Songs, mood) {
   }
 }
 
-export async function getTransferPlayback(code: string, trackId:string){
+export async function getTransferPlayback(deviceId: string, code: string, uri:string){
  
 
   const result = await fetch(
-    `https://api.spotify.com/v1/me/player`,
+    `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
     {
       method: "PUT",
       headers: { Authorization: `Bearer ${code}` },
-      body: {`[device_ids:${trackId}]` },
+      body: JSON.stringify({uris: [`${uri}`]})
     }
   );
-
-  return result.json();
 
 }

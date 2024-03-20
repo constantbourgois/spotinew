@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import Player from "./Player";
 import Moods from "./Moods";
-import { fetchTracks } from "./Spoti";
+import { fetchTracks, getTransferPlayback } from "./Spoti";
 import { getTrack } from "./Spoti";
 import loadingIcon from "./loading-icon.svg";
 import {authUser}  from "./Spoti";
@@ -64,9 +64,11 @@ function App() {
     setMood(mood);
     (async () => {
       const t = await getTrack(SongsArray, mood);
+      await getTransferPlayback(deviceId,firstToken,t);
+      /*
       const newAudioElem = new Audio(t); //get the audio
       setCurrentTrack(newAudioElem);
-      newAudioElem.play(); //
+      newAudioElem.play(); //*/
     })();
   };
   
