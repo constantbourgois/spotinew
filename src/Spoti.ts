@@ -145,8 +145,7 @@ export async function getTrack(Songs, mood) {
 
 export async function getTransferPlayback(deviceId: string, code: string, uri:string){
  
-
-  const result = await fetch(
+  await fetch(
     `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
     {
       method: "PUT",

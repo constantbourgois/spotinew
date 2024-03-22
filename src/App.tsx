@@ -1,11 +1,11 @@
 import "./App.scss";
 
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { useEffect } from "react";
 
 import Player from "./Player";
 import Moods from "./Moods";
-import { fetchTracks, getTransferPlayback } from "./Spoti";
+import { getTransferPlayback } from "./Spoti";
 import { getTrack } from "./Spoti";
 import loadingIcon from "./loading-icon.svg";
 import {authUser}  from "./Spoti";
@@ -24,7 +24,6 @@ const darkTheme = createTheme({
 export interface Props{
   token: string;
   selectedMood: string;
-
  
 }
 
@@ -32,12 +31,12 @@ export interface Props{
 function App() {
   const [showPlayer, setShowPlayer] = useState(false);
   const [isLoading, setLoading] = useState(true);
-  const [Mood, setMood] = useState();
-  const [SongsArray, setSongsArray] = useState();
+  const [Mood, setMood] = useState<string>("");
+  const [SongsArray, setSongsArray] = useState<string[]>([]);
   const [currentTrack, setCurrentTrack] = useState(new Audio);
   const [firstPlay, setFirstPlay] = useState(true);
   const [firstToken, setFirstToken] = useState<string>("");
-  const [deviceId, setDeviceId]  = useState();
+  const [deviceId, setDeviceId]  = useState<string>("");
 
 
   //const [code, setCode] = useState<string | null>(null);
@@ -46,9 +45,9 @@ function App() {
   useEffect(() => {
     (async () => {
  
-      const a = await authUser();
+      const accessToken = await authUser();
     
-      setFirstToken( a?.accessToken);
+      setFirstToken(accessToken);
      
       //const data = await fetchTracks(a?.accessToken);
       //setSongsArray(data);
@@ -63,8 +62,8 @@ function App() {
     setShowPlayer(true);
     setMood(mood);
     (async () => {
-      const t = await getTrack(SongsArray, mood);
-      await getTransferPlayback(deviceId,firstToken,t);
+      const track = await getTrack(SongsArray, mood);
+      await getTransferPlayback(deviceId,firstToken,track);
       /*
       const newAudioElem = new Audio(t); //get the audio
       setCurrentTrack(newAudioElem);
@@ -72,11 +71,11 @@ function App() {
     })();
   };
   
-  const getPlaylistTracks = (tracks) =>{
+  const getPlaylistTracks = (tracks: SetStateAction<string[]>) =>{
     setSongsArray(tracks);
   }
 
-  const getDeviceId = deviceId => {
+  const getDeviceId = (deviceId: SetStateAction<string>) => {
     setDeviceId(deviceId);
   }
   

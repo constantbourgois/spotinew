@@ -15,9 +15,10 @@ interface PlaylistI {
   key: string;
   name: string;
   id: string;
+  getPlaylistTracks: () => void;
 }
 
-export default function Playlists({ token , getPlaylistTracks }: Props) {
+export default function Playlists({ token }: Props,  { getPlaylistTracks }: PlaylistI) {
 
   const [playArr, setPlayArr] = useState<PlaylistI[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
