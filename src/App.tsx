@@ -1,4 +1,4 @@
-import "./App.scss";
+import "./assets/App.scss";
 
 import { SetStateAction, useState } from "react";
 import { useEffect } from "react";
@@ -7,13 +7,11 @@ import Player from "./Player";
 import Moods from "./Moods";
 import { getTransferPlayback } from "./Spoti";
 import { getTrack } from "./Spoti";
-import loadingIcon from "./loading-icon.svg";
+import loadingIcon from "./assets/loading-icon.svg";
 import {authUser}  from "./Spoti";
 import Playlists from "./Playlists";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-
-console.log(Playlists);
 
 const darkTheme = createTheme({
   palette: {
@@ -39,21 +37,15 @@ function App() {
   const [deviceId, setDeviceId]  = useState<string>("");
 
 
-  //const [code, setCode] = useState<string | null>(null);
-
-
   useEffect(() => {
     (async () => {
  
-      const accessToken = await authUser();
-    
+      const accessToken = await authUser(); // authenticate the user
+      
       setFirstToken(accessToken);
      
-      //const data = await fetchTracks(a?.accessToken);
-      //setSongsArray(data);
       setLoading(false);
-      // fetch the tracks
-      //firstFetchTracks();
+    
 
     })();
   }, []);

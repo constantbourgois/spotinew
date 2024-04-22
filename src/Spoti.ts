@@ -7,12 +7,12 @@ const clientId = "b75ef8547d5a48debd9d8ac5a0a34b33";
 export async function authUser() {
   /* get the client id and token */
   if (!code) {
-    redirectToAuthCodeFlow(clientId);
+    await redirectToAuthCodeFlow(clientId);
   } else {
     const accessToken = await getAccessToken(clientId, code);
     //const prof = await fetchProfile(accessToken);
 
-    return { accessToken };
+    return accessToken;
   }
 }
 /*

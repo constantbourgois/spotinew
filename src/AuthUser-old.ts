@@ -28,7 +28,8 @@ export default async function AuthUser(){
     }
     async function getPlaylists( code: string): Promise<PlaylistTypes>{
         const result = await fetch("https://api.spotify.com/v1/me/playlists",{
-            method: "GET", headers: { Authorization: `Bearer ${code}` }}
+            method: "GET", headers: { Authorization: 'Bearer ' + code }
+        }
         )
 
     return result.json();
