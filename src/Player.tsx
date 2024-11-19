@@ -9,7 +9,7 @@ import { GrStop } from "react-icons/gr";
 import { fetchTracks } from "./Spoti";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Props } from "./App";
+//import { Props } from "./App";
 
 const style = {
   width: "100vw",
@@ -37,8 +37,18 @@ const track = {
 
 
 
+interface Props{
+  token: string;
+  selectedMood: string;
+  firstPlay: boolean;
+  songsArray: string[];
+  showPlayer: boolean;
+  getDeviceId: (deviceId:string) => void;
+ 
+}
+
 export default function Player({token, selectedMood, getDeviceId}: Props) {
-  const [nextTrack, setNextTrack] = useState(null);
+  const [nextTrack, setNextTrack] = useState<HTMLAudioElement | null>(null);
   const mood = selectedMood;
   const [is_paused, setPaused] = useState(false);
     const [is_active, setActive] = useState(false);
@@ -48,6 +58,7 @@ export default function Player({token, selectedMood, getDeviceId}: Props) {
 
 
   useEffect(() => {
+    /*
     if (selectedMood) {
       //console.log(props.firstPlay);
       //props.setFirstPlay(false);
@@ -63,7 +74,7 @@ export default function Player({token, selectedMood, getDeviceId}: Props) {
       
       })();
     }
-    console.log("mood", selectedMood);
+    console.log("mood", selectedMood);*/
 
     const script = document.createElement("script");
         script.src = "https://sdk.scdn.co/spotify-player.js";

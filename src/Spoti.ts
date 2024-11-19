@@ -94,13 +94,12 @@ export async function fetchTracks(code: string, tracksP: number[]) {
                 i.track.danceability = audio_features["danceability"];
                 i.track.energy = audio_features["energy"];
                 r.push(i.track);
+               
               })
               .catch((error) => console.log("error", error));
           })();
     }
     ); // create a new array with the tracks ids
-
-    console.log(r);
 
     return r;
 

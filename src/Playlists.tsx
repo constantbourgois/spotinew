@@ -1,10 +1,8 @@
-
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { IconContext } from "react-icons";
 import { fetchTracks, getPlaylists, getTracksFromPlaylists } from "./Spoti";
 import { useEffect, useState } from "react";
-import { Props } from "./App";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -15,33 +13,44 @@ interface PlaylistI {
   key: string;
   name: string;
   id: string;
-  //getPlaylistTracks: () => void;
+  token: string;
+  getPlaylistTracks: (tracks: any) => void;
+
 }
 
-export default function Playlists({ token }: Props,  { getPlaylistTracks }: PlaylistI) {
+export default function Playlists({ token, getPlaylistTracks }: PlaylistI) {
 
   const [playArr, setPlayArr] = useState<PlaylistI[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string>('');
   const [tracksArray ,setTracksArray] = useState<string>('');
 
   const handleChange = (event: SelectChangeEvent) => {
-
-    const selPs = event.target.value;
-
-    setSelectedPlaylist(selPs);
+    setSelectedPlaylist(event.target.value);
+    const obj = JSON.parse(event.target.value);
+    setSelectedPlaylistId(obj.id);
+   
+     // get the playlist id selected by user
+    //setSelectedPlaylistName(event.target.playlistName);
+    /*playArr.forEach((item) => {
+      console.log(item.id, event.target.value);
+      if (item.id === event.target.value) {
+        setSelectedPlaylistName(item.name);
+        console.log(selectedPlaylistName);
+      }
+    });*/
+    // get the playlist name selected by user
 
     (async () => {
 
-      let tracks = await getTracksFromPlaylists(token, selPs);
-      
-      tracks = await fetchTracks(token, tracks);
-      getPlaylistTracks(tracks);
+     
       
 
     })()
   };
 
   useEffect(() => {
+    console.log(selectedPlaylist);
 
     (async () => {
 
@@ -49,11 +58,17 @@ export default function Playlists({ token }: Props,  { getPlaylistTracks }: Play
 
       setPlayArr(ps.items);
 
+      let tracks = await getTracksFromPlaylists(token, selectedPlaylistId);
+      
+      tracks = await fetchTracks(token, tracks);
+      
+      getPlaylistTracks(tracks);
+
     })()
 
-  }, [token])
+  }, [selectedPlaylist,token])
 
-  const playlists = playArr.map((item, index) => <MenuItem id={item.id} key={index} value={item.id}>{item.name}</MenuItem>)
+  const playlists = playArr.map((item) => <MenuItem key={item.id} value={JSON.stringify({id: item.id,name:item.name})} >{item.name}</MenuItem>)
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -63,7 +78,7 @@ export default function Playlists({ token }: Props,  { getPlaylistTracks }: Play
           <Grid item xs={12}>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <InputLabel id="demo-controlled-open-select-label">Playlist</InputLabel>
-              <Select value='' onChange={handleChange} name="pick-playlist">
+              <Select value={selectedPlaylist} onChange={handleChange} name="pick-playlist">
                 {playlists}
               </Select>
             </FormControl>

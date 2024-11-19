@@ -19,11 +19,16 @@ const darkTheme = createTheme({
   },
 });
 
+/*
 export interface Props{
   token: string;
   selectedMood: string;
+  firstPlay: boolean;
+  getDeviceId: (deviceId:string) => void;
  
 }
+*/
+
 
 
 function App() {
@@ -38,6 +43,7 @@ function App() {
 
 
   useEffect(() => {
+    debugger;
     (async () => {
  
       const accessToken = await authUser(); // authenticate the user
@@ -45,7 +51,6 @@ function App() {
       setFirstToken(accessToken);
      
       setLoading(false);
-    
 
     })();
   }, []);
@@ -63,8 +68,9 @@ function App() {
     })();
   };
   
-  const getPlaylistTracks = (tracks: SetStateAction<string[]>) =>{
+  const getPlaylistTracks = (tracks: any):void =>{
     setSongsArray(tracks);
+    console.log(tracks);
   }
 
   const getDeviceId = (deviceId: SetStateAction<string>) => {
@@ -83,14 +89,12 @@ function App() {
       <ThemeProvider theme={darkTheme}>
          <CssBaseline />
       <div className="App">
-          <Playlists getPlaylistTracks={getPlaylistTracks} token={firstToken}/>
+          <Playlists getPlaylistTracks={getPlaylistTracks} token={firstToken} key={""} name={""} id={""} />
           <Moods openPlayer={openPlayer} />
           <Player
             token={firstToken}
             firstPlay={firstPlay}
             getDeviceId={getDeviceId}
-            setFirstPlay={setFirstPlay}
-            currentTrack={currentTrack}
             songsArray={SongsArray}
             selectedMood={Mood}
             showPlayer={showPlayer}
